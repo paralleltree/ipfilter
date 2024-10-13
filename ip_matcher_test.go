@@ -27,6 +27,12 @@ func TestIPMatcher_Match(t *testing.T) {
 			wantResult: false,
 		},
 		{
+			name:       "single IPv4 range that does not match",
+			addr:       "192.168.1.1",
+			ranges:     []string{"192.168.10.0/26"},
+			wantResult: false,
+		},
+		{
 			name:       "single IPv6 range that matches",
 			addr:       "2001:db8::1",
 			ranges:     []string{"2001:db8::/64"},
