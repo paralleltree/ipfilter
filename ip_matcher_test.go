@@ -54,3 +54,21 @@ func TestIPMatcher_Match(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkIPMatcher_Test(b *testing.B) {
+	n := 100000
+	ranges := make([]string, 0, n+1)
+	for i := 0; i < n; i++ {
+		ranges = append(ranges, "192.168.0.0/24")
+	}
+	ranges = append(ranges, "192.168.1.0/24")
+	matcher, err := ipfilter.NewIPMatcher(ranges)
+	if err != nil {
+		b.Fatalf("new ip matcher: %v", err)
+	}
+	ip := net.ParseIP("192.168.1.1")
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		matcher.Match(ip)
+	}
+}
