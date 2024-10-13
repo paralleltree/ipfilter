@@ -104,15 +104,29 @@ func compareIP(maskLength int, a, b net.IP) int {
 	if len(a) != len(b) {
 		panic("ip address length not equal")
 	}
-	mask := net.CIDRMask(maskLength, len(a)*8)
+
 	for i := 0; i < len(a); i++ {
-		av := a[i] & mask[i]
-		bv := b[i] & mask[i]
+		// mask for the current byte
+		mask := byte(0xff)
+
+		// adjust the mask if the mask length is not a multiple of 8
+		if (i+1)*8 > maskLength {
+			mask <<= ((i+1)*8 - maskLength)
+		}
+
+		av := a[i] & mask
+		bv := b[i] & mask
+
 		if av < bv {
 			return -1
 		}
 		if av > bv {
 			return 1
+		}
+
+		// break when no more bits to compare
+		if mask != 0xff {
+			break
 		}
 	}
 	return 0
