@@ -85,6 +85,7 @@ func TestIPMatcher_Match(t *testing.T) {
 
 func BenchmarkIPMatcher_Test(b *testing.B) {
 	// on commit hash 6de25fd, the benchmark result is 1059579 ns/op
+	// on commit hash 5985bca, the benchmark result is 344.5 ns/op
 	n := 100000
 	ranges := make([]string, 0, n+1)
 	for i := 0; i < n; i++ {
