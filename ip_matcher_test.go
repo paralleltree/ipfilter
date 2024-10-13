@@ -38,6 +38,34 @@ func TestIPMatcher_Match(t *testing.T) {
 			ranges:     []string{"2001:db8::/64"},
 			wantResult: false,
 		},
+		{
+			// the head of the address is the same as the range, but the address should not match the range
+			// because they are different addresses.
+			// note: the first bytes of the address and range are is [32 0 0 0].
+			name:       "IPv4 range does not match IPv6 address",
+			addr:       "2000::1",
+			ranges:     []string{"32.0.0.0/8"},
+			wantResult: false,
+		},
+		{
+			name:       "IPv6 range does not match IPv4 address",
+			addr:       "32.0.0.1",
+			ranges:     []string{"2000::/8"},
+			wantResult: false,
+		},
+		{
+			name: "multiple IPv4 and IPv6 ranges that match IPv4 address",
+			addr: "192.168.100.1",
+			ranges: []string{
+				"2001:db8::/64",
+				// the ranges should be sorted internally to apply the binary search.
+				"192.168.200.0/24",
+				"192.168.100.0/24",
+				"192.168.1.0/24",
+				"192.168.0.0/24",
+			},
+			wantResult: true,
+		},
 	}
 
 	for _, tt := range tests {
