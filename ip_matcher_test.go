@@ -15,15 +15,27 @@ func TestIPMatcher_Match(t *testing.T) {
 		wantResult bool
 	}{
 		{
-			name:       "single range that matches",
+			name:       "single IPv4 range that matches",
 			addr:       "192.168.0.1",
 			ranges:     []string{"192.168.0.0/24"},
 			wantResult: true,
 		},
 		{
-			name:       "single range that does not match",
+			name:       "single IPv4 range that does not match",
 			addr:       "192.168.1.1",
 			ranges:     []string{"192.168.0.0/24"},
+			wantResult: false,
+		},
+		{
+			name:       "single IPv6 range that matches",
+			addr:       "2001:db8::1",
+			ranges:     []string{"2001:db8::/64"},
+			wantResult: true,
+		},
+		{
+			name:       "single IPv6 range that does not match",
+			addr:       "2001:db9::1",
+			ranges:     []string{"2001:db8::/64"},
 			wantResult: false,
 		},
 	}
