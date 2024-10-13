@@ -30,7 +30,10 @@ func TestIPMatcher_Match(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			matcher := ipfilter.NewIPMatcher(tt.ranges)
+			matcher, err := ipfilter.NewIPMatcher(tt.ranges)
+			if err != nil {
+				t.Fatalf("NewIPMatcher: %v", err)
+			}
 			ip := net.ParseIP(tt.addr)
 			gotResult := matcher.Match(ip)
 			if tt.wantResult != gotResult {
