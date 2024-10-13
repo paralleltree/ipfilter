@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"net"
 	"slices"
+	"sync"
 )
 
 type IPMatcher struct {
+	mu         sync.RWMutex
 	ipv4Ranges ipRangeSet
 	ipv6Ranges ipRangeSet
 }
@@ -62,22 +64,33 @@ func newIPRangeSetFromRangeString(ranges []string) (ipRangeSet, ipRangeSet, erro
 // NewIPMatcher creates a new IPMatcher.
 // The ranges parameter is a list of IP ranges in CIDR notation.
 func NewIPMatcher(ranges []string) (*IPMatcher, error) {
-	ipv4ranges, ipv6ranges, err := newIPRangeSetFromRangeString(ranges)
-	if err != nil {
-		return nil, fmt.Errorf("create IPMatcher: %w", err)
+	matcher := &IPMatcher{}
+	if err := matcher.ReplaceRanges(ranges); err != nil {
+		return nil, err
 	}
-	return &IPMatcher{
-		ipv4Ranges: ipv4ranges,
-		ipv6Ranges: ipv6ranges,
-	}, nil
+	return matcher, nil
 }
 
 // Match reports whether the given IP address is in the ranges.
 func (m *IPMatcher) Match(addr net.IP) bool {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
 	if ipv4Addr := addr.To4(); ipv4Addr != nil {
 		return m.ipv4Ranges.contains(ipv4Addr)
 	}
 	return m.ipv6Ranges.contains(addr)
+}
+
+func (m *IPMatcher) ReplaceRanges(ranges []string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	ipv4ranges, ipv6ranges, err := newIPRangeSetFromRangeString(ranges)
+	if err != nil {
+		return fmt.Errorf("set IP ranges: %w", err)
+	}
+	m.ipv4Ranges = ipv4ranges
+	m.ipv6Ranges = ipv6ranges
+	return nil
 }
 
 // compareIP compares two IP addresses with the mask length.
