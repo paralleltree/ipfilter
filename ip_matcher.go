@@ -81,6 +81,7 @@ func (m *IPMatcher) Match(addr net.IP) bool {
 	return m.ipv6Ranges.contains(addr)
 }
 
+// ReplaceRanges replaces the IP ranges with the new ranges.
 func (m *IPMatcher) ReplaceRanges(ranges []string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
