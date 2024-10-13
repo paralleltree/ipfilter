@@ -18,21 +18,21 @@ import (
 )
 
 func example() {
-	matcher, err := ipfilter.NewIPMatcher([]string{
-		"192.168.0.0/24",
-		"192.168.1.0/24",
-	})
-	if err != nil {
-		panic(err)
-	}
+  matcher, err := ipfilter.NewIPMatcher([]string{
+    "192.168.0.0/24",
+    "192.168.1.0/24",
+  })
+  if err != nil {
+    panic(err)
+  }
 
   ips := []string{
     "192.168.0.10",
     "192.168.20.10",
   }
-	for _, ip := range ips {
+  for _, ip := range ips {
     result := matcher.Match(net.ParseIP(ip))
-	  fmt.Printf("%s: %v\n", ip, result)
+    fmt.Printf("%s: %v\n", ip, result)
   }
   // Output:
   // 192.168.0.10: true
