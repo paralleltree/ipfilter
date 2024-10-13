@@ -27,9 +27,19 @@ func TestIPMatcher_Match(t *testing.T) {
 			wantResult: false,
 		},
 		{
+			// addr[3]  = 0b10000001
+			// range[3] = 0b10000000
+			name:       "single IPv4 range that matches",
+			addr:       "192.168.1.129",
+			ranges:     []string{"192.168.1.128/26"},
+			wantResult: true,
+		},
+		{
+			// addr[3]  = 0b01000001
+			// range[3] = 0b10000000
 			name:       "single IPv4 range that does not match",
-			addr:       "192.168.1.1",
-			ranges:     []string{"192.168.10.0/26"},
+			addr:       "192.168.1.65",
+			ranges:     []string{"192.168.1.128/26"},
 			wantResult: false,
 		},
 		{
